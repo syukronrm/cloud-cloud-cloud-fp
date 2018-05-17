@@ -1,0 +1,21 @@
+<!doctype html>
+
+<table>
+  <tr>
+    <td>ID</td>
+    <td>Name</td>
+    <td>Replicas</td>
+  </tr>
+{% for service in services %}
+  <tr>
+    <td><code>{{ service.id }}</code></td>
+    <td>{{ service.name }}</td>
+    <td>
+      <form action="/scale">
+        <input type="number" min=1 name="number" step="1" value={{ service.attrs['Spec']['Mode']['Replicated']['Replicas'] }}>
+        <input type="submit" value="scale">
+      </form>
+    </td>
+  </tr>
+{% endfor %}
+</table>

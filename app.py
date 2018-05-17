@@ -59,12 +59,19 @@ def deploy():
             --name ' + container + ' \
             --label traefik.port=80 \
             --network '+ cluster +' \
+            --label traefik.backend.loadbalancer.sticky=true \
             '+ image +'"')
 
         flash('container ' + container + ' on network ' + cluster + ' has been deployed')
         return redirect(url_for('deployment'))
 
     return render_template('deploy.html')
+
+@app.route('/deployment/scale', methods=['GET'])
+def scale():
+    if request.method == 'GET':
+        services = manager.services.list()
+        return render_template('scale.html', services=services)
 
 @app.route('/logout')
 def logout():
