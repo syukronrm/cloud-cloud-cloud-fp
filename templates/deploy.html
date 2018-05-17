@@ -1,0 +1,19 @@
+<!doctype html>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<title>Deploy new container</title>
+<h1>Upload new File</h1>
+File must be Dockerfile inside tar.gz
+<form method=post enctype=multipart/form-data>
+  <p><input type=file name=file>
+      <input type=submit value=Upload>
+</form>

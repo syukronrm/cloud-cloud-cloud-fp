@@ -1,0 +1,10 @@
+use case:
+- login
+    - dibuatkan network buat cluster
+
+- deploy app
+    - upload tar.gz
+    - spesifikkan direktori Dockerfile
+    - deploy
+      - build image
+
