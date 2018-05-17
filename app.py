@@ -1,6 +1,9 @@
 import os
 import subprocess
-import MySQLdb
+import sqlite3 as lite
+import machine
+import docker
+from docker import *
 from flask import Flask, session, redirect, url_for, escape, request, flash, render_template
 from werkzeug.utils import secure_filename
 
@@ -14,7 +17,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Set the secret key to some random bytes. Keep this really secret!
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
-db = MySQLdb.connect("localhost", "root", "sandi", "cloud" )
+con = lite.connect('init.db')
+
+m = machine.Machine(path="/usr/local/bin/docker-machine")
+manager = docker.DockerClient(**m.config(machine='manager'))
+managerLowLevel = docker.APIClient(**m.config(machine='manager'))
 
 @app.route('/')
 def index():
@@ -30,47 +37,37 @@ def login():
         return redirect(url_for('index'))
     return render_template('login.html')
 
-@app.route('/deploy', methods=['GET'])
+@app.route('/deployment', methods=['GET'])
 def deployment():
     return render_template('deployment.html')
 
-@app.route('/deploy/deploy', methods=['GET', 'POST'])
+@app.route('/deployment/deploy', methods=['GET', 'POST'])
 def deploy():
     if request.method == 'POST':
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
+        name = session['username']
+        cluster = request.form['cluster']
+        image = request.form['image']
+        container = request.form['container']
 
-        if file.filename == '':
-            flash('No selected file')
+        try:
+            client.networks.create(cluster, driver='overlay')
+        except:
+            pass
 
-            return redirect(request.url)
-        if file:
-            flash('file uploaded')
+        os.system('docker-machine ssh manager "docker network create --driver=overlay ' + cluster + '"')
+        os.system('docker-machine ssh manager "docker service create \
+            --name ' + container + ' \
+            --label traefik.port=80 \
+            --network '+ cluster +' \
+            '+ image +'"')
 
-            filename = secure_filename(file.filename)
-            foldername = filename.split('.')[0]
+        flash('container ' + container + ' on network ' + cluster + ' has been deployed')
+        return redirect(url_for('deployment'))
 
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-            command = '/bin/tar -xzf ' + filename + ' --directory ' + foldername
-
-            os.chdir(UPLOAD_FOLDER)
-            subprocess.check_output(['mkdir', foldername])
-            subprocess.check_output(command.split(' '))
-
-            return redirect(url_for('deploy', filename=filename))
-
-        flash('file not uploaded')
-        return redirect(request.url)
-
-    name = session['username']
-    return render_template('upload.html')
+    return render_template('deploy.html')
 
 @app.route('/logout')
 def logout():
-    # remove the username from the session if it's there
     session.pop('username', None)
     return redirect(url_for('index'))
 

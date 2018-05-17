@@ -10,10 +10,17 @@
   {% endif %}
 {% endwith %}
 
-<title>Deploy new container</title>
-<h1>Upload new File</h1>
-File must be Dockerfile inside tar.gz
-<form method=post enctype=multipart/form-data>
-  <p><input type=file name=file>
-      <input type=submit value=Upload>
+<p>Deploy from dockerhub</p>
+
+<form method="post">
+  Cluster name:
+  <input type=text name=cluster>
+  <br>
+  Image name (from dockerhub):
+  <input type=text name=image>
+  <br>
+  Container name (name it yourself):
+  <input type=text name=container>
+  <br>
+  <input type=submit value=Deploy>
 </form>
