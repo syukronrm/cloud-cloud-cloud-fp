@@ -5,14 +5,8 @@ import machine
 import docker
 from docker import *
 from flask import Flask, session, redirect, url_for, escape, request, flash, render_template
-from werkzeug.utils import secure_filename
-
-UPLOAD_FOLDER = '/home/syukronrm/Kuliah/cloud/fp/app/uploads'
-ALLOWED_EXTENSIONS = set(['tar.gz'])
 
 app = Flask(__name__)
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Set the secret key to some random bytes. Keep this really secret!
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -55,7 +49,6 @@ def deploy():
         except:
             pass
 
-
         domainLabel = ''
         if domain != '':
             domainLabel = '--label traefik.frontend.rule=Host:' + domain
@@ -89,10 +82,7 @@ def scale():
     services = manager.services.list()
     return render_template('scale.html', services=services)
     
-
-
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
-
