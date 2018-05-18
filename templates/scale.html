@@ -11,7 +11,8 @@
     <td><code>{{ service.id }}</code></td>
     <td>{{ service.name }}</td>
     <td>
-      <form action="/scale">
+      <form action="/deployment/scale" method="POST">
+        <input type='hidden' name="container_id" value={{ service.id }}>
         <input type="number" min=1 name="number" step="1" value={{ service.attrs['Spec']['Mode']['Replicated']['Replicas'] }}>
         <input type="submit" value="scale">
       </form>

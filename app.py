@@ -48,15 +48,23 @@ def deploy():
         cluster = request.form['cluster']
         image = request.form['image']
         container = request.form['container']
+        domain = request.form['domain']
 
         try:
             client.networks.create(cluster, driver='overlay')
         except:
             pass
 
+
+        domainLabel = ''
+        if domain != '':
+            domainLabel = '--label traefik.frontend.rule=Host:' + domain
+
         os.system('docker-machine ssh manager "docker network create --driver=overlay ' + cluster + '"')
+        os.system('docker-machine ssh manager "docker service update --network-add ' + cluster + ' traefik"')
         os.system('docker-machine ssh manager "docker service create \
             --name ' + container + ' \
+            ' + domainLabel + '\
             --label traefik.port=80 \
             --network '+ cluster +' \
             --label traefik.backend.loadbalancer.sticky=true \
@@ -67,11 +75,21 @@ def deploy():
 
     return render_template('deploy.html')
 
-@app.route('/deployment/scale', methods=['GET'])
+@app.route('/deployment/scale', methods=['GET', 'POST'])
 def scale():
-    if request.method == 'GET':
-        services = manager.services.list()
-        return render_template('scale.html', services=services)
+    if request.method == 'POST':
+        container_id = request.form['container_id']
+        scale_number = request.form['number']
+
+        os.system('docker-machine ssh manager "docker service scale ' + container_id + '=' + scale_number + '"')
+
+        flash('container ' + container_id + ' has been scaled to ' + scale_number)
+        return redirect(url_for('deployment'))
+
+    services = manager.services.list()
+    return render_template('scale.html', services=services)
+    
+
 
 @app.route('/logout')
 def logout():
