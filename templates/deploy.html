@@ -1,29 +1,109 @@
 <!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!--link rel="icon" href="/../../../../favicon.ico"-->
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+    <title>Deploy</title>
 
-<p>Deploy from dockerhub</p>
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
 
-<form method="post">
-  Cluster name:
-  <input type=text name=cluster>
-  <br>
-  Image name (from dockerhub):
-  <input type=text name=image>
-  <br>
-  Domain:
-  <input type=text name=domain>
-  <br>
-  Container name (name it yourself):
-  <input type=text name=container>
-  <br>
-  <input type=submit value=Deploy>
-</form>
+    <!-- Custom styles for this template -->
+    <link href="/css/home.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/home.html">One Time Deploy</a>
+      <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+          <a class="nav-link" href="/login.html">Sign out</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="/">
+                  <span data-feather="home"></span>
+                  Home
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="/deployment/deploy">
+                  <span data-feather="plus-square"></span>
+                  Deploy <span class="sr-only">(current)</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/deployment/scale">
+                  <span data-feather="copy"></span>
+                  Scale
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 border-bottom">
+            <h1 class="h2">Deploy</h1>
+          </div>
+            
+          <form class="mt-3" method="post">
+            <div class="form-group">
+              <label for="inputCluster" class="col-sm-1 col-form-label">Cluster</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="inputCluster" name="cluster" placeholder="Enter Cluster" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputImage" class="col-sm-1 col-form-label">Image</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="inputImage" name="image" placeholder="Image from Docker Hub" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputDomain" class="col-sm-1 col-form-label">Domain</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="inputDomain" name="domain" placeholder="Enter Domain" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputContainer" class="col-sm-1 col-form-label">Container</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="inputContainer" name="container" placeholder="Name it yourself" required>
+              </div>
+            </div>
+            <div class="form-group col-sm-1">
+              <button class="btn btn-primary btn-lg" type="submit" value="deploy">Deploy</button>
+            </div>
+          </form>
+        </main>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="js/jquery-slim.min.js"><\/script>')</script>
+    <script src="js/vendor/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Icons -->
+    <script src="js/feather.min.js"></script>
+    <script>
+      feather.replace()
+    </script>
+    <script src="js/holder.min.js"></script>
+  </body>
+</html>

@@ -4,9 +4,9 @@ import sqlite3 as lite
 import machine
 import docker
 from docker import *
-from flask import Flask, session, redirect, url_for, escape, request, flash, render_template
+from flask import Flask, session, redirect, url_for, escape, request, flash, render_template, send_from_directory
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 
 # Set the secret key to some random bytes. Keep this really secret!
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -17,12 +17,20 @@ m = machine.Machine(path="/usr/local/bin/docker-machine")
 manager = docker.DockerClient(**m.config(machine='manager'))
 managerLowLevel = docker.APIClient(**m.config(machine='manager'))
 
+@app.route('/js/<path:path>')
+def send_js(path):
+    return send_from_directory('static/js', path)
+
+@app.route('/css/<path:path>')
+def send_css(path):
+    return send_from_directory('static/css', path)
+
 @app.route('/')
 def index():
     name = None
     if 'username' in session:
         name = session['username']
-    return render_template('hello.html', name=name)
+    return render_template('home.html', name=name)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -30,10 +38,6 @@ def login():
         session['username'] = request.form['username']
         return redirect(url_for('index'))
     return render_template('login.html')
-
-@app.route('/deployment', methods=['GET'])
-def deployment():
-    return render_template('deployment.html')
 
 @app.route('/deployment/deploy', methods=['GET', 'POST'])
 def deploy():
@@ -43,11 +47,6 @@ def deploy():
         image = request.form['image']
         container = request.form['container']
         domain = request.form['domain']
-
-        try:
-            client.networks.create(cluster, driver='overlay')
-        except:
-            pass
 
         domainLabel = ''
         if domain != '':
@@ -64,7 +63,7 @@ def deploy():
             '+ image +'"')
 
         flash('container ' + container + ' on network ' + cluster + ' has been deployed')
-        return redirect(url_for('deployment'))
+        return redirect(url_for('index'))
 
     return render_template('deploy.html')
 
@@ -77,10 +76,21 @@ def scale():
         os.system('docker-machine ssh manager "docker service scale ' + container_id + '=' + scale_number + '"')
 
         flash('container ' + container_id + ' has been scaled to ' + scale_number)
-        return redirect(url_for('deployment'))
+        return redirect(url_for('index'))
 
     services = manager.services.list()
     return render_template('scale.html', services=services)
+
+@app.route('/deployment/rm', methods=['POST'])
+def service_rm():
+    service_name = request.form['service_name']
+
+    os.system('docker-machine ssh manager "docker service rm '+ service_name +' "')
+
+    flash('service ' + service_name + ' has been deleted')
+
+    return redirect(url_for('scale'))
+
     
 @app.route('/logout')
 def logout():
